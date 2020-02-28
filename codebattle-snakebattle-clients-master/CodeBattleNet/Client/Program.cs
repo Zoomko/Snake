@@ -1,0 +1,35 @@
+using System;
+using SnakeBattle.Api;
+
+namespace Client
+{
+    class Program
+    {
+        //const string SERVER_ADDRESS = "http://epruizhsa0001t2:8080/codenjoy-contest/board/player/4ol1pue9vqijd518yjlb?code=1180389975885916399&gameName=snakebattle";
+        const string SERVER_ADDRESS = "http://codingdojo2020.westeurope.cloudapp.azure.com/codenjoy-contest/board/player/lc35j4dwfll6a8i9jcww?code=6398271465899362279&gameName=snakebattle";
+
+        static void Main(string[] args)
+        {
+            var client = new SnakeBattleClient(SERVER_ADDRESS);
+            client.Run(DoRun);
+
+            Console.ReadKey();
+            client.InitiateExit();
+        }
+
+        public static GameBoard game;
+
+        private static SnakeAction DoRun(GameBoard gameBoard)
+        {
+            game = gameBoard;
+            return new SnakeAction(false, Direction.Right);
+        }
+
+        private static SnakeAction MoveToNearApple()
+        {
+            
+            game.GetApples();
+            return 
+        }
+    }
+}
