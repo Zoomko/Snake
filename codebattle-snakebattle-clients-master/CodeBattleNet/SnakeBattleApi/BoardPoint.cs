@@ -53,6 +53,10 @@
             return new BoardPoint(X, Y + delta);
 
         }
+        public static BoardPoint operator -(BoardPoint p1, BoardPoint p2)
+        {
+            return new BoardPoint(p1.X - p2.X, p1.Y - p2.Y);
+        }
 
         public static bool operator ==(BoardPoint p1, BoardPoint p2)
         {

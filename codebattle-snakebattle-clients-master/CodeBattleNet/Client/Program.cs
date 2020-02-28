@@ -1,4 +1,5 @@
 using System;
+using Client.SnakeBotDanik;
 using SnakeBattle.Api;
 
 namespace Client
@@ -17,7 +18,7 @@ namespace Client
             client.InitiateExit();
         }
 
-        private static IBot bot = new VectorFieldBot();
+        private static IBot bot = new DanikBot();
 
         private static SnakeAction DoRun(GameBoard gameBoard)
         {

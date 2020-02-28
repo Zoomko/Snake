@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\StoreOfPieces.cs" />
+    <Compile Include="Helpers\Helper.cs" />
     <Compile Include="IBot.cs" />
     <Compile Include="Algorithm\OnePiece.cs" />
     <Compile Include="Program.cs" />
@@ -61,8 +62,6 @@
   <ItemGroup>
     <Content Include="head_dead.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

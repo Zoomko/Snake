@@ -19,6 +19,19 @@
             _direction = direction;
         }
 
+        public bool IsOpposite(SnakeAction action)
+        {
+            if (action._direction == Direction.Down && _direction == Direction.Up)
+                return true;
+            if (action._direction == Direction.Left && _direction == Direction.Right)
+                return true;
+            if (action._direction == Direction.Up && _direction == Direction.Down)
+                return true;
+            if (action._direction == Direction.Right && _direction == Direction.Left)
+                return true;
+            return false;
+        }
+
         public override string ToString()
         {
             var cmd = _act ? ACT_COMMAND_PREFIX : string.Empty;
