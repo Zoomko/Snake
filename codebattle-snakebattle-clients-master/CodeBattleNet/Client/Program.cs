@@ -17,19 +17,11 @@ namespace Client
             client.InitiateExit();
         }
 
-        public static GameBoard game;
+        private static IBot bot;
 
         private static SnakeAction DoRun(GameBoard gameBoard)
         {
-            game = gameBoard;
-            return new SnakeAction(false, Direction.Right);
-        }
-
-        private static SnakeAction MoveToNearApple()
-        {
-            
-            game.GetApples();
-            return 
+            return bot.DoRun(gameBoard);
         }
     }
 }
