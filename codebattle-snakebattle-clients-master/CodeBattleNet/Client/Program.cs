@@ -17,7 +17,7 @@ namespace Client
             client.InitiateExit();
         }
 
-        private static IBot bot;
+        private static IBot bot = new VectorFieldBot();
 
         private static SnakeAction DoRun(GameBoard gameBoard)
         {

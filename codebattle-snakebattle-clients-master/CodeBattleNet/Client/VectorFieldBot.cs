@@ -1,4 +1,5 @@
-﻿using SnakeBattle.Api;
+﻿using Client.Algorithm;
+using SnakeBattle.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace Client
     {
         public SnakeAction DoRun(GameBoard game)
         {
+            var store = new StoreOfPieces(game.Size, game);
+            store.printWeights();
             return new SnakeAction(true, Direction.Down);
         }
     }

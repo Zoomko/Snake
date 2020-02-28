@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm\Algorithm.cs" />
+    <Compile Include="Algorithm\StoreOfPieces.cs" />
     <Compile Include="IBot.cs" />
     <Compile Include="Algorithm\OnePiece.cs" />
     <Compile Include="Program.cs" />
