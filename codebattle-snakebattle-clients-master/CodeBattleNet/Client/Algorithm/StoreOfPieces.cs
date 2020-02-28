@@ -81,8 +81,8 @@ namespace Client.Algorithm
             }
             private void CreateField()
             {
-                Console.WriteLine(pointOfCenter.X);
-                Console.WriteLine(pointOfCenter.Y);
+                //Console.WriteLine(pointOfCenter.X);
+                //Console.WriteLine(pointOfCenter.Y);
                 store[pointOfCenter.X, pointOfCenter.Y].Weight = value;
                 for (var i = -radius + 1; i < radius; i++)
                     for (var j = -radius + 1; j < radius; j++)

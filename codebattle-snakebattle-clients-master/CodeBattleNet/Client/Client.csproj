@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\StoreOfPieces.cs" />
+    <Compile Include="Helpers\SnakeActionHelper.cs" />
     <Compile Include="IBot.cs" />
     <Compile Include="Algorithm\OnePiece.cs" />
     <Compile Include="Program.cs" />
