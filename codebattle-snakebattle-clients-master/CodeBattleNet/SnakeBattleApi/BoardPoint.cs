@@ -1,4 +1,6 @@
-﻿namespace SnakeBattle.Api
+﻿using System.Collections.Generic;
+
+namespace SnakeBattle.Api
 {
     public struct BoardPoint
     {
@@ -51,8 +53,20 @@
         public BoardPoint ShiftBottom(int delta = 1)
         {
             return new BoardPoint(X, Y + delta);
-
         }
+
+        public IEnumerable<BoardPoint> OfRadius(int radius)
+        {
+            for(var i = X - radius; i < X + radius; i++)
+            {
+                for(var j = Y - radius; j < Y + radius; j++)
+                {
+                    if (X + Y - i + j <= radius)
+                        yield return new BoardPoint(i, j);
+                }
+            }
+        }
+
         public static BoardPoint operator -(BoardPoint p1, BoardPoint p2)
         {
             return new BoardPoint(p1.X - p2.X, p1.Y - p2.Y);

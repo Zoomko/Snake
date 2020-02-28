@@ -9,7 +9,30 @@ namespace Client.Helpers
 {
     class SnakeInfo
     {
-        public static HashSet<BoardElement> enemyHead = new HashSet<BoardElement>
+
+        public static HashSet<BoardElement> EnemyElements = new HashSet<BoardElement>
+        {
+            BoardElement.EnemyHeadDown,
+            BoardElement.EnemyHeadLeft,
+            BoardElement.EnemyHeadUp,
+            BoardElement.EnemyHeadRight,
+            BoardElement.EnemyHeadDead,
+            BoardElement.EnemyHeadEvil,
+            BoardElement.EnemyHeadFly,
+            BoardElement.EnemyBodyHorizontal,
+            BoardElement.EnemyBodyLeftDown,
+            BoardElement.EnemyBodyLeftUp,
+            BoardElement.EnemyBodyRightDown,
+            BoardElement.EnemyBodyRightUp,
+            BoardElement.EnemyBodyVertical,
+            BoardElement.EnemyTailEndDown,
+            BoardElement.EnemyTailEndLeft,
+            BoardElement.EnemyTailEndRight,
+            BoardElement.EnemyTailEndUp,
+            BoardElement.EnemyTailInactive
+        };
+
+        public static HashSet<BoardElement> EnemyHead = new HashSet<BoardElement>
         {
             BoardElement.EnemyHeadDown,
             BoardElement.EnemyHeadLeft,
@@ -20,7 +43,7 @@ namespace Client.Helpers
             BoardElement.EnemyHeadFly
         };
 
-        public static HashSet<BoardElement> enemyBody = new HashSet<BoardElement>
+        public static HashSet<BoardElement> EnemyBody = new HashSet<BoardElement>
         {
             BoardElement.EnemyBodyHorizontal,
             BoardElement.EnemyBodyLeftDown,
@@ -30,11 +53,75 @@ namespace Client.Helpers
             BoardElement.EnemyBodyVertical
         };
 
+        public static HashSet<BoardElement> EnemyTail = new HashSet<BoardElement>
+        {
+            BoardElement.EnemyTailEndDown,
+            BoardElement.EnemyTailEndLeft,
+            BoardElement.EnemyTailEndRight,
+            BoardElement.EnemyTailEndUp,
+            BoardElement.EnemyTailInactive
+        };
+
+        public static HashSet<BoardElement> HeroElements = new HashSet<BoardElement>
+        {
+            BoardElement.BodyHorizontal,
+            BoardElement.BodyLeftDown,
+            BoardElement.BodyLeftUp,
+            BoardElement.BodyRightDown,
+            BoardElement.BodyRightUp,
+            BoardElement.BodyVertical,
+            BoardElement.TailEndDown,
+            BoardElement.TailEndLeft,
+            BoardElement.TailEndRight,
+            BoardElement.TailEndUp,
+            BoardElement.TailInactive,
+            BoardElement.HeadDead,
+            BoardElement.HeadDown,
+            BoardElement.HeadEvil,
+            BoardElement.HeadFly,
+            BoardElement.HeadLeft,
+            BoardElement.HeadRight,
+            BoardElement.HeadSleep,
+            BoardElement.HeadUp
+        };
+
+        public static HashSet<BoardElement> HeroHead = new HashSet<BoardElement>
+        {
+            BoardElement.HeadDead,
+            BoardElement.HeadDown,
+            BoardElement.HeadEvil,
+            BoardElement.HeadFly,
+            BoardElement.HeadLeft,
+            BoardElement.HeadRight,
+            BoardElement.HeadSleep,
+            BoardElement.HeadUp
+        };
+
+        public static HashSet<BoardElement> HeroBody = new HashSet<BoardElement>
+        {
+            BoardElement.BodyHorizontal,
+            BoardElement.BodyLeftDown,
+            BoardElement.BodyLeftUp,
+            BoardElement.BodyRightDown,
+            BoardElement.BodyRightUp,
+            BoardElement.BodyVertical
+        };
+
+        public static HashSet<BoardElement> HeroTail = new HashSet<BoardElement>
+        { 
+            BoardElement.TailEndDown,
+            BoardElement.TailEndLeft,
+            BoardElement.TailEndRight,
+            BoardElement.TailEndUp,
+            BoardElement.TailInactive
+        };
+
 
         public HashSet<BoardPoint> bodyPoints = new HashSet<BoardPoint>();
-        public int Length;
+        public int Length => bodyPoints.Count();
         public Direction Direction;
         public BoardPoint Head;
+        public BoardPoint Tail;
 
         public SnakeInfo(GameBoard gameBoard, BoardPoint head)
         {
@@ -44,12 +131,14 @@ namespace Client.Helpers
         public void SnakeInit(GameBoard gameBoard, BoardPoint head)
         {
             Head = head;
-            var body = Head;
-            Length = 1;
+            var body = head;
+            if (gameBoard.HasElementAt(Tail, EnemyTail))
+                body = Tail;
+            else
+                bodyPoints.Clear();
             while (true)
             {
                 bodyPoints.Add(body);
-                Length++;
                 var down = body.ShiftBottom();
                 var up = body.ShiftTop();
                 var left = body.ShiftLeft();

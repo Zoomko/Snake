@@ -15,7 +15,7 @@ namespace Client.Helpers
         public void Update(GameBoard gameBoard)
         {
             GameBoard = gameBoard;
-            var headPoints = gameBoard.FindAllElements(SnakeInfo.enemyHead.ToArray());
+            var headPoints = gameBoard.FindAllElements(SnakeInfo.EnemyHead.ToArray());
 
             Enemys = headPoints.Select(point =>
             {
@@ -37,8 +37,8 @@ namespace Client.Helpers
 
         public SnakeInfo GetEnemySnakeInfo(BoardPoint point)
         {
-            if(!GameBoard.HasElementAt(point, SnakeInfo.enemyBody) 
-                && !GameBoard.HasElementAt(point, SnakeInfo.enemyHead))
+            if(!GameBoard.HasElementAt(point, SnakeInfo.EnemyBody) 
+                && !GameBoard.HasElementAt(point, SnakeInfo.EnemyHead))
             {
                 Enemy.Remove(point);
                 return null;

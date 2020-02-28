@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using static SnakeBattle.Api.BoardElement;
 
@@ -9,15 +10,35 @@ namespace SnakeBattle.Api
     {
         public GameBoard(string boardString)
         {
-            BoardString = boardString.Replace("\n", "");
+            BoardString = boardString.Replace("\n", "").Replace('○', 'o');
             Size = (int)Math.Sqrt(BoardString.Length);
             Square = BoardString.Length;
+            Init();
         }
 
-        public void FindAllElements(object enemyHeadDown, object enemyHeadLeft)
+        public List<BoardPoint> Enemys = new List<BoardPoint>();
+        public List<BoardPoint> Bariers = new List<BoardPoint>();
+        public List<BoardPoint> Apples = new List<BoardPoint>();
+        public List<BoardPoint> Hero = new List<BoardPoint>();
+
+        private void Init()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < Square; i++)
+            {
+                var point = GetPointByShift(i);
+                if (HasElementAt(point, BoardElement.Apple))
+                    Apples.Add(point);
+
+                if (HasElementAt(point, Wall, StartFloor, EnemyHeadSleep, EnemyTailInactive, TailInactive, Stone))
+                    Bariers.Add(point);
+
+                if(HasElementAt(point, Snake))
+
+            }
+
+            
         }
+
 
         /// <summary>
         /// Строка, представляющая собой поле.
@@ -112,10 +133,14 @@ namespace SnakeBattle.Api
 
         public void PrintBoard()
         {
+            //var log = "";
             for (int i = 0; i < Size; i++)
             {
-                Console.WriteLine(BoardString.Substring(i * Size, Size));
+                var str = BoardString.Substring(i * Size, Size);
+                //log += str + "\n";
+                Console.WriteLine(str);
             }
+            //File.WriteAllText("log", log);
         }
 
         public BoardPoint? FindElement(BoardElement elementType)
@@ -160,6 +185,26 @@ namespace SnakeBattle.Api
                 var point = GetPointByShift(i);
 
                 foreach(var element in elements)
+                {
+                    if (HasElementAt(point, element))
+                    {
+                        result.Add(point);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public List<BoardPoint> FindAllElements(HashSet<BoardElement> elements)
+        {
+            var result = new List<BoardPoint>();
+
+            for (int i = 0; i < Square; i++)
+            {
+                var point = GetPointByShift(i);
+
+                foreach (var element in elements)
                 {
                     if (HasElementAt(point, element))
                     {
