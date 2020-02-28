@@ -1,64 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SnakeBattle.Api;
 
 namespace Client
 {
-    class OnePiece
-    {
-        private float weight;
-        private List<float> listOfValue;
-        private BoardPoint point;
-        public OnePiece(int w, BoardPoint p)
-        {
-            listOfValue = new List<float>();
-            weight = w;
-            point = p;
-        }
-        public OnePiece(BoardPoint p)
-        {
-            listOfValue = new List<float>();
-            weight = 0;
-            point = p;
-        }
-        public void UpdatePiece()
-        {
-            listOfValue.Clear();
-            weight = 0;
-        }
-        public float Weight
-        {
-            get
-            {
-                return weight;
-            }
-            set
-            {
-                weight = value;
-            }
-        }
-        public void AddWeightValue(float v)
-        {
-            listOfValue.Add(v);
-        }
-        public void MeanValue()
-        {
-            var sum = 0.0f;
-            foreach (var i in listOfValue)
-            {
-                sum += i;
-            }
-            if (listOfValue.Count == 0)
-                weight = 0;
-            else
-                weight = sum / listOfValue.Count;
-        }
-        public void ClearList()
-        {
-            listOfValue.Clear();
-        }
-    }
-
     class StoreOfPieces
     {
         public static OnePiece[,] store;
@@ -73,6 +19,7 @@ namespace Client
         }
         private void Update()
         {
+            
             for (var i = 0; i < size; i++)
             {
                 for (var j = 0; j < size; j++)
