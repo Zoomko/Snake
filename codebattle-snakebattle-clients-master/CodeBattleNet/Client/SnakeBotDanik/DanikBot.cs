@@ -17,7 +17,7 @@ namespace Client.SnakeBotDanik
         public DanikBot()
         {
             window = new TargetWindow(5);
-            window.AddSensor(BoardElement.Apple, 1);
+            window.AddSensor(BoardElement.Apple, 10);
         }
 
         public SnakeAction DoRun(GameBoard game)
@@ -127,14 +127,15 @@ namespace Client.SnakeBotDanik
                 if (IsActiv(point))
                 {
                     var shift = center - point;
+                    var len = Math.Abs(shift.X) + Math.Abs(shift.Y) + 1;
                     if (shift.X > 0)
-                        Weight.left = Activate;
+                        Weight.left = Activate / len ;
                     else if (shift.X < 0)
-                        Weight.right = Activate;
+                        Weight.right = Activate / len;
                     if (shift.Y > 0)
-                        Weight.up = Activate;
+                        Weight.up = Activate / len;
                     else if (shift.Y < 0)
-                        Weight.down = Activate;
+                        Weight.down = Activate / len;
 
                     return Weight;
                 }     
