@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\StoreOfPieces.cs" />
+    <Compile Include="Helpers\GameMap.cs" />
     <Compile Include="Helpers\Helper.cs" />
+    <Compile Include="Helpers\SnakeInfo.cs" />
     <Compile Include="IBot.cs" />
     <Compile Include="Algorithm\OnePiece.cs" />
     <Compile Include="Program.cs" />

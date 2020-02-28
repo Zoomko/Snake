@@ -1,4 +1,5 @@
-﻿using SnakeBattle.Api;
+﻿using Client.Helpers;
+using SnakeBattle.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,33 +14,76 @@ namespace Client.SnakeBotDanik
         BoardPoint head;
         TargetWindow window;
         SnakeAction prevAction = SnakeAction.Right;
+        TiksTaskMaker taskMaker = new TiksTaskMaker();
+        GameMap map = new GameMap();
+
+        public static GameBoard Game;
 
         public DanikBot()
         {
             window = new TargetWindow(5);
+
+            var barierSensor = new SensorParemetrizer(() => Game.GetBarriers(), (len) =>
+            {
+                if (len == 1)
+                    return -100;
+                return 0;
+            });
+            window.AddParametrizedSensor(barierSensor);
+
             window.AddSensor(BoardElement.Apple, (len) =>
             {
-                if(len != 0)
+                if (len != 0)
                     return 20 / len;
                 return 0;
             });
-            window.AddSensor(BoardElement.Wall, (len) =>
+
+            window.AddSensor(BoardElement.Gold, (len) =>
+            {
+                if (len != 0)
+                    return 50 / len;
+                return 0;
+            });
+
+            window.AddSensor(BoardElement.FuryPill, (len) =>
+            {
+                if (len < 3)
+                    return 50;
+                return 0;
+            });
+
+            window.AddSensor(BoardElement.FlyingPill, (len) =>
+            {
+                if (len < 3)
                 {
-                    if (len == 1)
-                        return -100;
-                    else
-                        return 0;
-                });
+                    barierSensor.active = false;
+                    taskMaker.AddTask(() => barierSensor.active = true, 10);
+                    return 50;
+                }
+                return 0;
+            });
         }
 
         public SnakeAction DoRun(GameBoard game)
         {
-            if(game.GetMyHead().HasValue)
+            Game = game;
+            if (game.GetMyHead().HasValue)
                 head = game.GetMyHead().Value;
             TargetWindow.Init(game, head);
+            map.Update(game);
+            var enemys = map.Enemys;
+            
+            Console.WriteLine(string.Join(" ", enemys.Select(v => v.Length)));
+            MakeTaskLogick();
             var headCell = window.Update();
             Console.WriteLine(headCell);
+
             return CreateSnakeAktionForSensValue(headCell);
+        }
+
+        private void MakeTaskLogick()
+        {
+            taskMaker.Update();
         }
 
         public SnakeAction CreateSnakeAktionForSensValue(TargetWindow.SensValue sensValue)
@@ -71,10 +115,48 @@ namespace Client.SnakeBotDanik
         }
     }
 
+    public class TiksTaskMaker
+    {
+        public long Tick { get; private set; }
+        private List<TickTask> tasks = new List<TickTask>();
+
+        public void AddTask(Action task, int time)
+        {
+            tasks.Add(new TickTask(task, Tick + time));
+        }
+
+        public void Update()
+        {
+            foreach(var task in tasks.ToList())
+            {
+                if(task.IsShouldActivate(Tick))
+                {
+                    tasks.Remove(task);
+                    task.Action();
+                }
+            }
+            Tick++;
+        }
+
+        public class TickTask
+        {
+            public Action Action;
+            public long TimeActivate;
+
+            public TickTask(Action action, long timeActivate)
+            {
+                Action = action;
+                TimeActivate = timeActivate;
+            }
+
+            public bool IsShouldActivate(long curTime) => TimeActivate == curTime;
+        }
+    }
+
     public class TargetWindow
     {
-        public static GameBoard Game;
 
+        public static GameBoard Game;
         public static void Init(GameBoard game, BoardPoint head)
         {
             Game = game;
@@ -84,7 +166,7 @@ namespace Client.SnakeBotDanik
         private int size;
         private static BoardPoint сenter;
 
-        Dictionary<BoardElement, Sensor> sensors = new Dictionary<BoardElement, Sensor>();
+        List<SensorParemetrizer> sensors = new List<SensorParemetrizer>();
         SensValue head;
         SensValue[,] pole;
 
@@ -96,9 +178,20 @@ namespace Client.SnakeBotDanik
             head = new SensValue();
         }
 
-        public void AddSensor(BoardElement boardElement, Func<int, int> activate)
+        public void AddSensor(BoardElement element, Func<int, int> activate)
         {
-            sensors[boardElement] = new Sensor(pole, activate) { Element = boardElement };
+            AddParametrizedSensor(new SensorParemetrizer(() => Game.FindAllElements(element), activate));
+        }
+
+        public void AddSensor(Func<IEnumerable<BoardPoint>> getActivePoints, Func<int, int> activate)
+        {
+            AddParametrizedSensor(new SensorParemetrizer(getActivePoints, activate));
+        }
+
+        public void AddParametrizedSensor(SensorParemetrizer sensor)
+        {
+            sensor.Sensor = new Sensor(pole, sensor.Activate);
+            sensors.Add(sensor);
         }
 
         public SensValue Update()
@@ -106,17 +199,38 @@ namespace Client.SnakeBotDanik
             head = SensValue.Zero;
             foreach(var sensor in sensors)
             {
-                var apples = Game.FindAllElements(sensor.Key);
-                var sum = SensValue.Zero;
-                foreach(var el in apples.Select(ap => sensor.Value.GetValue(сenter, ap)))
+                if (sensor.active)
                 {
-                    sum += el;
+                    var elements = sensor.GetActivePoints();
+                    var sum = SensValue.Zero;
+                    foreach (var el in elements.Select(ap => sensor.Sensor.ActivateAndGetValue(сenter, ap)))
+                    {
+                        sum += el;
+                    }
+                    head += sum;
                 }
-                head += sum;
             }
  
             return head;
         }
+
+        public class SensorParemetrizer
+        {
+            public bool active = true;
+            public Func<IEnumerable<BoardPoint>> GetActivePoints;
+            public Func<int, int> Activate;
+            public Sensor Sensor;
+
+            public SensorParemetrizer(
+                Func<IEnumerable<BoardPoint>> getActivePoints,
+                Func<int, int> activate
+                )
+            {
+                GetActivePoints = getActivePoints;
+                Activate = activate;
+            }
+        }
+
         public class Sensor
         { 
             public Func<int, int> Activate;
@@ -139,20 +253,26 @@ namespace Client.SnakeBotDanik
                 var Weight = new SensValue();
                 if (IsActiv(point))
                 {
-                    var shift = center - point;
-                    var len = Math.Abs(shift.X) + Math.Abs(shift.Y);
-                    if (shift.X > 0)
-                        Weight.left = Activate(len);
-                    else if (shift.X < 0)
-                        Weight.right = Activate(len);
-                    if (shift.Y > 0)
-                        Weight.up = Activate(len);
-                    else if (shift.Y < 0)
-                        Weight.down = Activate(len);
-
-                    return Weight;
+                    return ActivateAndGetValue(center, point);
                 }     
                 return SensValue.Zero;
+            }
+
+            public SensValue ActivateAndGetValue(BoardPoint center, BoardPoint point)
+            {
+                var Weight = new SensValue();
+                var shift = center - point;
+                var len = Math.Abs(shift.X) + Math.Abs(shift.Y);
+                if (shift.X > 0)
+                    Weight.left = Activate(len);
+                else if (shift.X < 0)
+                    Weight.right = Activate(len);
+                if (shift.Y > 0)
+                    Weight.up = Activate(len);
+                else if (shift.Y < 0)
+                    Weight.down = Activate(len);
+
+                return Weight;
             }
         }
 

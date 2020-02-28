@@ -14,6 +14,11 @@ namespace SnakeBattle.Api
             Square = BoardString.Length;
         }
 
+        public void FindAllElements(object enemyHeadDown, object enemyHeadLeft)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Строка, представляющая собой поле.
         /// </summary>
@@ -82,7 +87,7 @@ namespace SnakeBattle.Api
             return FindAllElements(StartFloor);
         }
 
-        private List<BoardPoint> GetBarriers()
+        public List<BoardPoint> GetBarriers()
         {
             return FindAllElements(Wall, StartFloor, EnemyHeadSleep, EnemyTailInactive, TailInactive, Stone);
         }
@@ -167,6 +172,11 @@ namespace SnakeBattle.Api
         }
 
         public bool HasElementAt(BoardPoint point, params BoardElement[] elements)
+        {
+            return elements.Any(e => HasElementAt(point, e));
+        }
+
+        public bool HasElementAt(BoardPoint point, HashSet<BoardElement> elements)
         {
             return elements.Any(e => HasElementAt(point, e));
         }
