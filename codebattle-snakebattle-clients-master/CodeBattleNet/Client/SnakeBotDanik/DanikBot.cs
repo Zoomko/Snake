@@ -17,12 +17,25 @@ namespace Client.SnakeBotDanik
         public DanikBot()
         {
             window = new TargetWindow(5);
-            window.AddSensor(BoardElement.Apple, 10);
+            window.AddSensor(BoardElement.Apple, (len) =>
+            {
+                if(len != 0)
+                    return 20 / len;
+                return 0;
+            });
+            window.AddSensor(BoardElement.Wall, (len) =>
+                {
+                    if (len == 1)
+                        return -100;
+                    else
+                        return 0;
+                });
         }
 
         public SnakeAction DoRun(GameBoard game)
         {
-            head = game.GetMyHead().Value;
+            if(game.GetMyHead().HasValue)
+                head = game.GetMyHead().Value;
             TargetWindow.Init(game, head);
             var headCell = window.Update();
             Console.WriteLine(headCell);
@@ -83,34 +96,34 @@ namespace Client.SnakeBotDanik
             head = new SensValue();
         }
 
-        public void AddSensor(BoardElement boardElement, int activate)
+        public void AddSensor(BoardElement boardElement, Func<int, int> activate)
         {
             sensors[boardElement] = new Sensor(pole, activate) { Element = boardElement };
         }
 
         public SensValue Update()
         {
+            head = SensValue.Zero;
             foreach(var sensor in sensors)
             {
-                var apples = Game.GetApples();
+                var apples = Game.FindAllElements(sensor.Key);
                 var sum = SensValue.Zero;
                 foreach(var el in apples.Select(ap => sensor.Value.GetValue(сenter, ap)))
                 {
                     sum += el;
                 }
-                head = sum;
+                head += sum;
             }
  
             return head;
         }
         public class Sensor
-        {
-            
-            public int Activate;
+        { 
+            public Func<int, int> Activate;
             public BoardElement Element;
             SensValue[,] pole;
 
-            public Sensor(SensValue[,] pole, int activate)
+            public Sensor(SensValue[,] pole, Func<int, int> activate)
             {
                 this.pole = pole;
                 Activate = activate;
@@ -127,15 +140,15 @@ namespace Client.SnakeBotDanik
                 if (IsActiv(point))
                 {
                     var shift = center - point;
-                    var len = Math.Abs(shift.X) + Math.Abs(shift.Y) + 1;
+                    var len = Math.Abs(shift.X) + Math.Abs(shift.Y);
                     if (shift.X > 0)
-                        Weight.left = Activate / len ;
+                        Weight.left = Activate(len);
                     else if (shift.X < 0)
-                        Weight.right = Activate / len;
+                        Weight.right = Activate(len);
                     if (shift.Y > 0)
-                        Weight.up = Activate / len;
+                        Weight.up = Activate(len);
                     else if (shift.Y < 0)
-                        Weight.down = Activate / len;
+                        Weight.down = Activate(len);
 
                     return Weight;
                 }     
